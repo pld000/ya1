@@ -1,5 +1,13 @@
+from enum import Enum
+
+class CleaningState(Enum):
+    WATER = "water"
+    SOAP = "soap"
+    BRUSH = "brush"
+
 class CleanerBot:
-    cleaningState = None
+    def __init__(self):
+        self.__cleaning_state = None
 
     def move(self, distance):
         print(f"POS {distance}")
@@ -7,41 +15,44 @@ class CleanerBot:
     def turn(self, angle):
         print(f"ANGLE {angle}")
 
-    def setCleaningState(self, state):
-        self.cleaningState = state
-        print(f"STATE {state}")
+    def set_cleaning_state(self, state):
+        try:
+            self.__cleaning_state = CleaningState(state)
+            print(f"STATE {state}")
+        except ValueError:
+            print(f"Wrong cleaning state {state}, water, soap, brush are accesible")
 
     def start(self):
-        print(f"START WITH {self.cleaningState}")
+        print(f"START WITH {CleaningState(self.__cleaning_state)}")
 
     def stop(self):
         print("STOP")
 
-    def getCleaningState(self):
-        return self.cleaningState
 
-
-def activateCleanerBot(cleanerBot: CleanerBot):
+def activate_cleaner_bot(cleanerBot: CleanerBot):
     return {
         'move': cleanerBot.move,
         'turn': cleanerBot.turn,
-        'set': cleanerBot.setCleaningState,
+        'set': cleanerBot.set_cleaning_state,
         'start': cleanerBot.start,
         'stop': cleanerBot.stop
     }
 
-bot = activateCleanerBot(CleanerBot())
-while True:
+
+bot = activate_cleaner_bot(CleanerBot())
+running = True
+while running:
     commands = input("Commands: ").split(',')
     for command in commands:
         command_name, _, param = command.strip().partition(' ')
-        if command_name == "exit" or command_name == "quit" or command_name == "q":
+        if command_name in ("exit", "quit", "q"):
+            running = False
             break
 
-        if command_name == 'stop' or command_name == "start":
-            bot[command_name]()
+        if command_name in bot:
+            if command_name in ("stop", "start"):
+                bot[command_name]()
+            else:
+                bot[command_name](param)
         else:
-            bot[command_name](param)
-
-
-
+            print(f"Unknown command: {command_name}")
