@@ -1,10 +1,12 @@
 from enum import Enum
 import math
 
+
 class CleaningState(Enum):
     WATER = "water"
     SOAP = "soap"
     BRUSH = "brush"
+
 
 class CleanerBot:
     def __init__(self):
@@ -14,53 +16,63 @@ class CleanerBot:
         self.__y = 0
 
     def move(self, distance):
-        self.__angle = self.__angle * (math.pi / 180.0)
-        self.__x += int(distance) * math.cos(self.__angle)
-        self.__y += int(distance) * math.sin(self.__angle)
-        print('POS(', self.__x, ',', self.__y, ')')
+        angle_rads = self.__angle * (math.pi / 180.0)
+        dist = float(distance)
+
+        self.__x += dist * math.cos(angle_rads)
+        self.__y += dist * math.sin(angle_rads)
+        return f"POS ({self.__x}, {self.__y})"
 
     def turn(self, angle):
-        self.__angle += int(angle)
-        print(f"ANGLE {self.__angle}")
+        self.__angle += float(angle)
+        return f"ANGLE {self.__angle}"
 
     def set_cleaning_state(self, state):
         try:
             self.__cleaning_state = CleaningState(state)
-            print(f"STATE {self.__cleaning_state}")
+            return f"STATE {state}"
         except ValueError:
-            print(f"Wrong cleaning state {state}, water, soap, brush are accesible")
+            return f"Wrong cleaning state {state}, water, soap, brush are accessible"
 
     def start(self):
-        print(f"START WITH {CleaningState(self.__cleaning_state)}")
+        return f"START WITH {self.__cleaning_state.value}"
 
     def stop(self):
-        print("STOP")
+        return "STOP"
 
 
-def activate_cleaner_bot(cleanerBot: CleanerBot):
+def activate_cleaner_bot(cleaner: CleanerBot):
     return {
-        'move': cleanerBot.move,
-        'turn': cleanerBot.turn,
-        'set': cleanerBot.set_cleaning_state,
-        'start': cleanerBot.start,
-        'stop': cleanerBot.stop
+        "move": cleaner.move,
+        "turn": cleaner.turn,
+        "set": cleaner.set_cleaning_state,
+        "start": cleaner.start,
+        "stop": cleaner.stop,
     }
 
 
-bot = activate_cleaner_bot(CleanerBot())
+def transfer_to_cleaner(mapper, bot_command: str):
+    name, _, params = bot_command.strip().partition(' ')
+    if name not in mapper:
+        return f"Unknown command: {name}"
+
+    if params == '':
+        return mapper[name]()
+    else:
+        return mapper[name](params)
+
+
+bot = CleanerBot()
+commands_mapper = activate_cleaner_bot(bot)
+
 running = True
 while running:
     commands = input("Commands: ").split(',')
     for command in commands:
-        command_name, _, param = command.strip().partition(' ')
-        if command_name in ("exit", "quit", "q"):
+        command = command.strip()
+        if command in ("exit", "quit", "q"):
             running = False
             break
 
-        if command_name in bot:
-            if command_name in ("stop", "start"):
-                bot[command_name]()
-            else:
-                bot[command_name](param)
-        else:
-            print(f"Unknown command: {command_name}")
+        result = transfer_to_cleaner(commands_mapper, command)
+        print(result)
