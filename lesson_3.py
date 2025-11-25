@@ -51,7 +51,8 @@ def activate_cleaner_bot(cleaner: CleanerBot):
     }
 
 
-def transfer_to_cleaner(mapper, bot_command: str):
+def transfer_to_cleaner(bot_command: str):
+    mapper = activate_cleaner_bot(bot)
     name, _, params = bot_command.strip().partition(' ')
     if name not in mapper:
         return f"Unknown command: {name}"
@@ -63,7 +64,6 @@ def transfer_to_cleaner(mapper, bot_command: str):
 
 
 bot = CleanerBot()
-commands_mapper = activate_cleaner_bot(bot)
 
 running = True
 while running:
@@ -74,5 +74,5 @@ while running:
             running = False
             break
 
-        result = transfer_to_cleaner(commands_mapper, command)
+        result = transfer_to_cleaner(command)
         print(result)
