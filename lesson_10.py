@@ -1,3 +1,4 @@
+#Functional injection - 2
 import pure_robot
 
 

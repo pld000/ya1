@@ -1,3 +1,4 @@
+#Stateless
 import pure_robot
 
 
