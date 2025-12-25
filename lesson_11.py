@@ -48,11 +48,11 @@ def cmd_set(stack, state):
     transfer_to_cleaner(("STATE", m))
     return new_state
 
-def cmd_start(stack, state):
+def cmd_start(state):
     transfer_to_cleaner(("START WITH", state.state))
     return state
 
-def cmd_stop(stack, state):
+def cmd_stop(state):
     transfer_to_cleaner(("STOP",))
     return state
 
@@ -76,8 +76,6 @@ def interpret(stream, state):
                 stack.append(token)
     return state
 
-# пример
-if __name__ == "__main__":
-    s = RobotState(0, 0, 0, WATER)
-    code = "100 move -90 turn soap set start 50 move stop"
-    interpret(code, s)
+
+
+interpret("100 move -90 turn soap set start 50 move stop", RobotState(0, 0, 0, WATER))
