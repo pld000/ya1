@@ -1,3 +1,5 @@
+# Abstract Data Type
+
 import math
 from dataclasses import dataclass
 from typing import Callable, Literal
